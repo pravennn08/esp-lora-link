@@ -1,0 +1,45 @@
+
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# PlatformIO local configuration
+platformio_override.ini
+
+# IDE Settings
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Compiled Files
+*.o
+*.a
+*.elf
+*.hex
+*.bin
+*.map
+*.d
+
+# Temporary Files
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*~
+
+# Operating System
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python Cache (if using build scripts)
+__pycache__/
+*.pyc
+
+# Environment Variables
+.env
+.env.*
+!.env.example
