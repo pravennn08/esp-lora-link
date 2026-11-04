@@ -20,15 +20,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - source: LoraNodeA
-            sketch: LoRaButtonNodeA
-          - source: LoraNodeB
-            sketch: LoRaButtonNodeB
+        sketch: [LoRaButtonNodeA, LoRaButtonNodeB]
     env:
       ESP32_CORE_VERSION: "3.3.0"
       LORA_VERSION: "0.8.0"
-      SOURCE_DIR: ${{ matrix.source }}
       SKETCH: ${{ matrix.sketch }}
     defaults:
       run:
@@ -52,17 +47,10 @@ jobs:
           arduino-cli core install "esp32:esp32@$ESP32_CORE_VERSION"
           arduino-cli lib install "LoRa@$LORA_VERSION"
 
-      # Arduino requires the sketch folder to match the main .ino filename.
-      - name: Prepare sketch folder
-        run: |
-          mkdir -p "$RUNNER_TEMP/$SKETCH"
-          cp "$SOURCE_DIR/$SKETCH.ino" "$RUNNER_TEMP/$SKETCH/"
-          cp "$SOURCE_DIR/LoRaButtonLink.h" "$RUNNER_TEMP/$SKETCH/"
-
       - name: Compile for ESP32 Dev Module
         run: |
           arduino-cli compile \
             --fqbn esp32:esp32:esp32 \
             --warnings all \
             --jobs 2 \
-            "$RUNNER_TEMP/$SKETCH"
+            "$SKETCH"

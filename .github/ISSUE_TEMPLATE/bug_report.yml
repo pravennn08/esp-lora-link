@@ -1,0 +1,99 @@
+name: Bug report
+description: Report a build, wiring, or radio communication problem.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Include enough information to reproduce the problem. For hardware issues, tell us about both nodes. You can attach wiring photos to the text fields.
+
+  - type: input
+    id: revision
+    attributes:
+      label: Project revision
+      description: Commit hash, release tag, or branch and download date.
+      placeholder: "main, downloaded 2026-11-04"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected-node
+    attributes:
+      label: Affected node
+      options:
+        - Node A
+        - Node B
+        - Both nodes
+        - Build or documentation only
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Build environment
+      description: OS, Arduino IDE or CLI version, ESP32 board package version, selected board, and LoRa library version.
+      placeholder: |
+        OS:
+        IDE / CLI version:
+        ESP32 board package version:
+        Selected board / FQBN:
+        LoRa library author and version:
+    validations:
+      required: true
+
+  - type: textarea
+    id: hardware
+    attributes:
+      label: Hardware and wiring
+      description: List the ESP32 and radio models, frequency, antennas, power supply, and GPIO connections. Attach a wiring photo if helpful. For a build-only issue, enter "Not applicable".
+      placeholder: |
+        Node A board / radio:
+        Node B board / radio:
+        Radio frequency / antennas:
+        Power supply:
+        GPIO wiring or photo:
+        Changes from the README wiring:
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Upload ...
+        2. Power ...
+        3. Press ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Serial or compiler logs
+      description: Paste relevant logs. For radio issues, use 115200 baud and identify which node produced each log.
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks already performed
+      options:
+        - label: I searched existing issues.
+        - label: I checked the README troubleshooting section.
+        - label: I checked the wiring, radio settings, and distinct node IDs on both boards.

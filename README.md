@@ -2,18 +2,17 @@
 
 # ESP LoRa Link
 
-**Two ESP32 boards. Two buttons. A wireless link.**
-
 Bidirectional button-to-LED control over LoRa: hold a button on one board to light the other board's LED, then release it to turn the LED off.
 
 [![ESP32](https://img.shields.io/badge/ESP32-E7352C?style=flat&logo=espressif&logoColor=white)](https://docs.espressif.com/projects/arduino-esp32/en/latest/)
 [![Arduino](https://img.shields.io/badge/Arduino-00979D?style=flat&logo=arduino&logoColor=white)](https://www.arduino.cc/en/software)
-[![C++](https://img.shields.io/badge/C%2B%2B-00599C?style=flat&logo=cplusplus&logoColor=white)](LoraNodeA/LoRaButtonNodeA.ino)
+[![C++](https://img.shields.io/badge/C%2B%2B-00599C?style=flat&logo=cplusplus&logoColor=white)](LoRaButtonNodeA/LoRaButtonNodeA.ino)
 [![LoRa](https://img.shields.io/badge/LoRa-433%20MHz-6C3EA1?style=flat)](#radio-settings)
+[![LoRa library 0.8.0](https://img.shields.io/badge/LoRa_library-0.8.0-00979D?style=flat)](https://github.com/sandeepmistry/arduino-LoRa)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE.md)
 [![CI](https://github.com/pravennn08/esp-lora-link/actions/workflows/ci.yml/badge.svg)](https://github.com/pravennn08/esp-lora-link/actions/workflows/ci.yml)
 
-[Get started](#getting-started) · [Wiring](#wiring) · [Run the demo](#run-the-demo) · [Troubleshooting](#troubleshooting)
+[Get started](#getting-started) · [Wiring](#wiring) · [Run the demo](#run-the-demo) · [Troubleshooting](#troubleshooting) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 
 </div>
 
@@ -27,6 +26,10 @@ ESP LoRa Link connects two ESP-WROOM-32 / ESP32 Dev Module boards using point-to
 Node A button ─────── LoRa ───────► Node B LED
 Node A LED    ◄────── LoRa ──────── Node B button
 ```
+
+![Illustrative animation: each button controls the other node's LED](docs/demo.gif)
+
+*Illustrative animation of the intended behavior; hardware results depend on your setup.*
 
 ### Features
 
@@ -42,36 +45,50 @@ Node A LED    ◄────── LoRa ──────── Node B button
 
 For the complete two-node demo:
 
-| Component | Quantity | Notes |
-| --- | --- | --- |
-| ESP-WROOM-32 development board | 2 | Select **ESP32 Dev Module** in Arduino IDE |
-| 433 MHz SX127x LoRa module | 2 | For example, an SX1278 module compatible with the Arduino LoRa library |
-| Matching 433 MHz antenna | 2 | Attach before powering the radios |
-| Momentary push button | 2 | One per board |
-| LED and current-limiting resistor | 2 each | One external LED per board; choose a resistor suitable for the LED, such as 330 Ω |
-| Breadboard and jumper wires | As needed | Repeat the same wiring for both nodes |
-| USB data cable | 2 | For power, upload, and serial monitoring |
+| Component                         | Quantity  | Notes                                                                             |
+| --------------------------------- | --------- | --------------------------------------------------------------------------------- |
+| ESP-WROOM-32 development board    | 2         | Select **ESP32 Dev Module** in Arduino IDE                                        |
+| 433 MHz SX127x LoRa module        | 2         | For example, an SX1278 module compatible with the Arduino LoRa library            |
+| Matching 433 MHz antenna          | 2         | Attach before powering the radios                                                 |
+| Momentary push button             | 2         | One per board                                                                     |
+| LED and current-limiting resistor | 2 each    | One external LED per board; choose a resistor suitable for the LED, such as 330 Ω |
+| Breadboard and jumper wires       | As needed | Repeat the same wiring for both nodes                                             |
+| USB data cable                    | 2         | For power, upload, and serial monitoring                                          |
 
 The [Arduino LoRa library](https://github.com/sandeepmistry/arduino-LoRa#compatible-hardware) supports SX1276/77/78/79 radios. Choose modules and antennas that support the configured frequency. Use a stable **3.3 V** radio supply and 3.3 V logic; check your module's pinout before wiring.
+
+## Software dependencies
+
+| Dependency | Version / purpose |
+| --- | --- |
+| [LoRa by Sandeep Mistry](https://github.com/sandeepmistry/arduino-LoRa) | **0.8.0** — radio communication through `LoRa.h` |
+| [ESP32 by Espressif Systems](https://docs.espressif.com/projects/arduino-esp32/en/latest/) | **3.3.0** in CI — ESP32 board support, SPI, and system headers |
+| Arduino IDE or Arduino CLI | IDE for interactive upload; CLI **1.x** in CI |
+
+The LoRa dependency is the **LoRa 0.8.0** package shown in Arduino Library Manager, authored by **Sandeep Mistry**. Install it through Library Manager or with `arduino-cli lib install "LoRa@0.8.0"`. Its source and MIT license are available in the [upstream repository](https://github.com/sandeepmistry/arduino-LoRa).
 
 ## Wiring
 
 Use these connections on **both** boards. The GPIO numbers match the supplied sketches.
 
-| LoRa module pin | ESP32 connection |
-| --- | --- |
-| VCC | 3V3 |
-| GND | GND |
-| SCK | GPIO18 |
-| MISO | GPIO19 |
-| MOSI | GPIO23 |
-| NSS / CS | GPIO5 |
-| NRESET / RST | GPIO4 |
-| DIO0 | GPIO2 |
+![ESP32 to 433 MHz LoRa module, button, and LED wiring](docs/wiring.png)
 
-| Peripheral | Connection |
-| --- | --- |
-| Push button | GPIO16 → button → GND |
+*Logical connections for one node; repeat for the other. Pin placement in the diagram is illustrative, so use your module's printed labels.*
+
+| LoRa module pin | ESP32 connection |
+| --------------- | ---------------- |
+| VCC             | 3V3              |
+| GND             | GND              |
+| SCK             | GPIO18           |
+| MISO            | GPIO19           |
+| MOSI            | GPIO23           |
+| NSS / CS        | GPIO5            |
+| NRESET / RST    | GPIO4            |
+| DIO0            | GPIO2            |
+
+| Peripheral   | Connection                                               |
+| ------------ | -------------------------------------------------------- |
+| Push button  | GPIO16 → button → GND                                    |
 | External LED | GPIO21 → resistor → LED anode (+); LED cathode (−) → GND |
 
 The button uses `INPUT_PULLUP`: released is HIGH and pressed is LOW. The LED is active HIGH. Each radio must share ground with its ESP32.
@@ -96,37 +113,30 @@ Alternatively, use **Code → Download ZIP** on GitHub and extract the archive.
    https://espressif.github.io/arduino-esp32/package_esp32_index.json
    ```
 
-3. Open **Boards Manager**, search for **esp32**, and install **esp32 by Espressif Systems**.
+3. Open **Boards Manager**, search for **esp32**, and install **esp32 by Espressif Systems**, selecting version **3.3.0** to match CI.
 4. Select **Tools → Board → esp32 → ESP32 Dev Module** for an ESP-WROOM-32 development board.
 
 See Espressif's [installation guide](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html#installing-using-arduino-ide) for platform-specific details.
 
 ### 3. Install the LoRa library
 
-In Arduino IDE, open **Library Manager**, search for **LoRa**, and install **LoRa by Sandeep Mistry**. See the library's [installation instructions](https://github.com/sandeepmistry/arduino-LoRa#installation).
+In Arduino IDE, open **Library Manager**, search for **LoRa**, and install **LoRa by Sandeep Mistry**, selecting version **0.8.0**. See the library's [installation instructions](https://github.com/sandeepmistry/arduino-LoRa#installation).
 
 `SPI.h`, `esp_system.h`, and `esp_random.h` come with the ESP32 board package. `LoRaButtonLink.h` is included in this repository.
 
-### 4. Prepare the Arduino sketch folders
+### 4. Open the sketches
 
-Arduino requires each sketch folder to match its main `.ino` filename. The repository uses `LoraNodeA` and `LoraNodeB`, so create these folders in your Arduino sketchbook and copy the files as shown:
+The sketch folders already match their main `.ino` filenames, so you can open them directly in Arduino IDE:
 
-```text
-<your Arduino sketchbook>/
-├── LoRaButtonNodeA/
-│   ├── LoRaButtonNodeA.ino    ← copy from LoraNodeA/
-│   └── LoRaButtonLink.h       ← copy from LoraNodeA/
-└── LoRaButtonNodeB/
-    ├── LoRaButtonNodeB.ino    ← copy from LoraNodeB/
-    └── LoRaButtonLink.h       ← copy from LoraNodeB/
-```
+- Node A: `LoRaButtonNodeA/LoRaButtonNodeA.ino`
+- Node B: `LoRaButtonNodeB/LoRaButtonNodeB.ino`
 
-Find the sketchbook location in Arduino IDE's **Preferences**. Keep the header beside its `.ino` file in each folder. If you later edit the repository sources, update these copies before uploading again.
+Keep `LoRaButtonLink.h` beside its `.ino` in each folder. No additional copying or folder preparation is needed.
 
 ### 5. Upload Node A
 
 1. Connect the first ESP32 using a USB data cable.
-2. Open the prepared `LoRaButtonNodeA/LoRaButtonNodeA.ino` in Arduino IDE.
+2. Open `LoRaButtonNodeA/LoRaButtonNodeA.ino` in Arduino IDE.
 3. Confirm the board is **ESP32 Dev Module** and choose its port under **Tools → Port**.
 4. Click **Verify**, then **Upload**.
 5. Open **Serial Monitor**, set the baud rate to **115200**, and press **EN / RESET** to see the startup messages.
@@ -177,23 +187,23 @@ Sequence numbers, signal readings, and timing vary. An `[ACK]` confirms a matchi
 
 Both sketches use the following defaults:
 
-| Setting | Value |
-| --- | --- |
-| Frequency | 433 MHz (`433000000L`) |
-| Transmit power | 14 dBm |
-| Spreading factor | SF7 |
-| Bandwidth | 125 kHz |
-| Coding rate | 4/5 |
-| Preamble | 8 symbols |
-| Sync word | `0x12` |
-| Radio CRC | Enabled |
-| SPI frequency | 1 MHz |
-| Packet size | 16 bytes |
-| Held-state refresh | 750 ms + 0–200 ms jitter |
-| Released-state refresh | 3000 ms + 0–200 ms jitter |
-| ACK timeout | 500 ms after transmission completes |
-| Transmit-completion timeout | 2000 ms |
-| LED timeout | 2500 ms without a fresh peer state while the LED is on |
+| Setting                     | Value                                                  |
+| --------------------------- | ------------------------------------------------------ |
+| Frequency                   | 433 MHz (`433000000L`)                                 |
+| Transmit power              | 14 dBm                                                 |
+| Spreading factor            | SF7                                                    |
+| Bandwidth                   | 125 kHz                                                |
+| Coding rate                 | 4/5                                                    |
+| Preamble                    | 8 symbols                                              |
+| Sync word                   | `0x12`                                                 |
+| Radio CRC                   | Enabled                                                |
+| SPI frequency               | 1 MHz                                                  |
+| Packet size                 | 16 bytes                                               |
+| Held-state refresh          | 750 ms + 0–200 ms jitter                               |
+| Released-state refresh      | 3000 ms + 0–200 ms jitter                              |
+| ACK timeout                 | 500 ms after transmission completes                    |
+| Transmit-completion timeout | 2000 ms                                                |
+| LED timeout                 | 2500 ms without a fresh peer state while the LED is on |
 
 Change radio parameters on **both nodes** together. Keep their node IDs distinct. GPIO mappings and timing constants are near the top of each `.ino`; packet handling and `LINK_TIMEOUT_MS` are in each `LoRaButtonLink.h`. Keep both header copies synchronized when changing the protocol.
 
@@ -202,15 +212,23 @@ Change radio parameters on **both nodes** together. Keep their node IDs distinct
 ```text
 esp-lora-link/
 ├── .github/
-│   └── workflows/
-│       └── ci.yml            # Compile both ESP32 sketches on GitHub Actions
-├── LoraNodeA/
+│   ├── ISSUE_TEMPLATE/
+│   │   └── bug_report.yml
+│   ├── workflows/
+│   │   └── ci.yml
+│   └── pull_request_template.md
+├── docs/
+│   ├── demo.gif              # Illustrative behavior animation
+│   └── wiring.png            # Logical wiring for each node
+├── LoRaButtonNodeA/
 │   ├── LoRaButtonNodeA.ino    # Node 1 firmware
-│   └── LoRaButtonLink.h       # Packet encoding and remote-state handling
-├── LoraNodeB/
+│   └── LoRaButtonLink.h       # Shared protocol implementation
+├── LoRaButtonNodeB/
 │   ├── LoRaButtonNodeB.ino    # Node 2 firmware
-│   └── LoRaButtonLink.h       # Same protocol header for Node 2
+│   └── LoRaButtonLink.h       # Matching protocol copy
 ├── .gitignore
+├── CHANGELOG.md
+├── CONTRIBUTING.md
 ├── LICENSE.md
 └── README.md
 ```
@@ -219,23 +237,29 @@ esp-lora-link/
 
 [GitHub Actions CI](https://github.com/pravennn08/esp-lora-link/actions/workflows/ci.yml) compiles both sketches for **ESP32 Dev Module** on every push and pull request. You can also run it manually from the repository's **Actions → CI → Run workflow** menu after the workflow is on the default branch.
 
-The workflow uses Arduino CLI 1.x, ESP32 core **3.3.0**, and LoRa **0.8.0**. Each node gets its own build job, with a temporary sketch folder matching its `.ino` filename. Update the dependency versions in `.github/workflows/ci.yml` when changing the build environment.
+The workflow uses Arduino CLI 1.x, ESP32 core **3.3.0**, and LoRa **0.8.0**. Each node gets its own build job and compiles directly from its matching sketch folder. Update the dependency versions in `.github/workflows/ci.yml` when changing the build environment.
 
 CI checks compilation; use the physical two-board demo above to verify wiring and radio communication.
 
 ## Troubleshooting
 
-| Symptom | What to check |
-| --- | --- |
-| `LoRa.h: No such file or directory` | Install **LoRa by Sandeep Mistry** in Library Manager. |
-| `LoRaButtonLink.h: No such file or directory` | Copy the matching header into the same prepared folder as the `.ino`. |
-| Arduino asks to move the sketch | Complete the matching-folder setup in step 4 and open the prepared copy. |
-| Upload cannot connect | Confirm the board, USB data cable, and port. If necessary, hold **BOOT** while the uploader connects, then release it. |
-| `[INIT FAIL] RegVersion=...` | Check 3.3 V power, ground, SPI wiring, NSS, reset, and module compatibility. The sketch expects register version `0x12`; press **EN / RESET** after fixing wiring. |
-| `[NO ACK]` | Confirm the peer is powered, running the other node ID, and using matching radio settings. Check antennas and reduce distance for the initial test. |
-| LED does not respond | Check LED polarity, resistor, GPIO21 wiring, and button-to-GND wiring on GPIO16. The button controls the **other board's LED**. |
-| `[LINK TIMEOUT]` | Fresh peer states stopped arriving while the LED was on. Check peer power, interference, range, and radio wiring. |
-| Unreadable serial text | Set Serial Monitor to **115200 baud**. |
+| Symptom                                       | What to check                                                                                                                                                      |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `LoRa.h: No such file or directory`           | Install **LoRa by Sandeep Mistry** in Library Manager.                                                                                                             |
+| `LoRaButtonLink.h: No such file or directory` | Keep the matching header in the same folder as the `.ino`.                                                                                              |
+| Arduino asks to move the sketch               | Extract the complete repository and open the `.ino` inside its matching folder, as shown in step 4.                                                                                           |
+| Upload cannot connect                         | Confirm the board, USB data cable, and port. If necessary, hold **BOOT** while the uploader connects, then release it.                                             |
+| `[INIT FAIL] RegVersion=...`                  | Check 3.3 V power, ground, SPI wiring, NSS, reset, and module compatibility. The sketch expects register version `0x12`; press **EN / RESET** after fixing wiring. |
+| `[NO ACK]`                                    | Confirm the peer is powered, running the other node ID, and using matching radio settings. Check antennas and reduce distance for the initial test.                |
+| LED does not respond                          | Check LED polarity, resistor, GPIO21 wiring, and button-to-GND wiring on GPIO16. The button controls the **other board's LED**.                                    |
+| `[LINK TIMEOUT]`                              | Fresh peer states stopped arriving while the LED was on. Check peer power, interference, range, and radio wiring.                                                  |
+| Unreadable serial text                        | Set Serial Monitor to **115200 baud**.                                                                                                                             |
+
+## Contributing
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for the build commands, testing guidance, and pull request process. Report problems through the [bug-report form](https://github.com/pravennn08/esp-lora-link/issues/new?template=bug_report.yml), including your hardware, wiring, dependency versions, and logs.
+
+See [CHANGELOG.md](CHANGELOG.md) for changes awaiting release.
 
 ## License
 
