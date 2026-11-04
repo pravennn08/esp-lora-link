@@ -11,6 +11,7 @@ Bidirectional button-to-LED control over LoRa: hold a button on one board to lig
 [![C++](https://img.shields.io/badge/C%2B%2B-00599C?style=flat&logo=cplusplus&logoColor=white)](LoraNodeA/LoRaButtonNodeA.ino)
 [![LoRa](https://img.shields.io/badge/LoRa-433%20MHz-6C3EA1?style=flat)](#radio-settings)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE.md)
+[![CI](https://github.com/pravennn08/esp-lora-link/actions/workflows/ci.yml/badge.svg)](https://github.com/pravennn08/esp-lora-link/actions/workflows/ci.yml)
 
 [Get started](#getting-started) · [Wiring](#wiring) · [Run the demo](#run-the-demo) · [Troubleshooting](#troubleshooting)
 
@@ -200,6 +201,9 @@ Change radio parameters on **both nodes** together. Keep their node IDs distinct
 
 ```text
 esp-lora-link/
+├── .github/
+│   └── workflows/
+│       └── ci.yml            # Compile both ESP32 sketches on GitHub Actions
 ├── LoraNodeA/
 │   ├── LoRaButtonNodeA.ino    # Node 1 firmware
 │   └── LoRaButtonLink.h       # Packet encoding and remote-state handling
@@ -210,6 +214,14 @@ esp-lora-link/
 ├── LICENSE.md
 └── README.md
 ```
+
+## Continuous integration
+
+[GitHub Actions CI](https://github.com/pravennn08/esp-lora-link/actions/workflows/ci.yml) compiles both sketches for **ESP32 Dev Module** on every push and pull request. You can also run it manually from the repository's **Actions → CI → Run workflow** menu after the workflow is on the default branch.
+
+The workflow uses Arduino CLI 1.x, ESP32 core **3.3.0**, and LoRa **0.8.0**. Each node gets its own build job, with a temporary sketch folder matching its `.ino` filename. Update the dependency versions in `.github/workflows/ci.yml` when changing the build environment.
+
+CI checks compilation; use the physical two-board demo above to verify wiring and radio communication.
 
 ## Troubleshooting
 

@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compile:
+    name: Compile ${{ matrix.sketch }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - source: LoraNodeA
+            sketch: LoRaButtonNodeA
+          - source: LoraNodeB
+            sketch: LoRaButtonNodeB
+    env:
+      ESP32_CORE_VERSION: "3.3.0"
+      LORA_VERSION: "0.8.0"
+      SOURCE_DIR: ${{ matrix.source }}
+      SKETCH: ${{ matrix.sketch }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+        with:
+          version: "1.x"
+
+      - name: Install ESP32 core and LoRa library
+        run: |
+          arduino-cli config init
+          arduino-cli config add board_manager.additional_urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          arduino-cli core update-index
+          arduino-cli core install "esp32:esp32@$ESP32_CORE_VERSION"
+          arduino-cli lib install "LoRa@$LORA_VERSION"
+
+      # Arduino requires the sketch folder to match the main .ino filename.
+      - name: Prepare sketch folder
+        run: |
+          mkdir -p "$RUNNER_TEMP/$SKETCH"
+          cp "$SOURCE_DIR/$SKETCH.ino" "$RUNNER_TEMP/$SKETCH/"
+          cp "$SOURCE_DIR/LoRaButtonLink.h" "$RUNNER_TEMP/$SKETCH/"
+
+      - name: Compile for ESP32 Dev Module
+        run: |
+          arduino-cli compile \
+            --fqbn esp32:esp32:esp32 \
+            --warnings all \
+            --jobs 2 \
+            "$RUNNER_TEMP/$SKETCH"
