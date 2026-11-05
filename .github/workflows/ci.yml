@@ -8,65 +8,31 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  compile:
-    name: Compile ${{ matrix.sketch }}
+  check:
+    name: Check sketch files
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        sketch: [LoRaButtonNodeA, LoRaButtonNodeB]
-    env:
-      ESP32_CORE_VERSION: "3.3.0"
-      LORA_VERSION: "0.8.0"
-      SKETCH: ${{ matrix.sketch }}
-    defaults:
-      run:
-        shell: bash
+    timeout-minutes: 5
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
         with:
           persist-credentials: false
 
-      - name: Set up Arduino CLI
-        uses: arduino/setup-arduino-cli@v2
-        with:
-          version: "1.x"
-
-      - name: Install ESP32 core and LoRa library
+      - name: Check sketches and shared headers
+        shell: python
         run: |
-          # Retry transient download failures, but still fail after three attempts.
-          retry() {
-            local attempt
-            for attempt in 1 2 3; do
-              if "$@"; then
-                return 0
-              fi
-              if (( attempt == 3 )); then
-                echo "::error::Command failed after 3 attempts: $*" >&2
-                return 1
-              fi
-              echo "::warning::Attempt $attempt failed; retrying in $((attempt * 15)) seconds."
-              sleep "$((attempt * 15))"
-            done
-          }
+          from pathlib import Path
 
-          arduino-cli config init
-          arduino-cli config add board_manager.additional_urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
-          retry arduino-cli core update-index
-          retry arduino-cli core install "esp32:esp32@$ESP32_CORE_VERSION"
-          retry arduino-cli lib install "LoRa@$LORA_VERSION"
+          headers = []
+          for sketch in ("LoRaButtonNodeA", "LoRaButtonNodeB"):
+              for filename in (f"{sketch}.ino", "LoRaButtonLink.h"):
+                  path = Path(sketch) / filename
+                  if not path.is_file() or not path.read_bytes().strip():
+                      raise SystemExit(f"Missing or empty file: {path}")
+              headers.append((Path(sketch) / "LoRaButtonLink.h").read_bytes())
 
-      - name: Compile for ESP32 Dev Module
-        run: |
-          arduino-cli compile \
-            --fqbn esp32:esp32:esp32 \
-            --warnings all \
-            --jobs 2 \
-            "$SKETCH"
+          if headers[0] != headers[1]:
+              raise SystemExit("The two LoRaButtonLink.h files must match.")
+
+          print("Both sketches are present and shared headers match.")

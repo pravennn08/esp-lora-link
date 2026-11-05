@@ -10,7 +10,7 @@ For a feature idea, open an issue describing the behavior you want and a practic
 
 ## Set up locally
 
-Follow the [README setup instructions](README.md#getting-started). The build dependencies used by CI are:
+Follow the [README setup instructions](README.md#getting-started). The documented local build dependencies are:
 
 | Dependency | Version / target |
 | --- | --- |
@@ -42,7 +42,7 @@ Arduino IDE users can open each `.ino` directly from its matching folder and use
 
 ## Validate your work
 
-For firmware changes, compile **both** sketches. CI performs compilation; it cannot verify wiring or radio behavior.
+For firmware changes, compile **both** sketches locally. CI checks that the sketch and header files are present and nonempty, and that both protocol headers match. It does not compile firmware or verify wiring or radio behavior.
 
 When hardware is available, check both directions:
 

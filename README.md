@@ -62,8 +62,8 @@ The [Arduino LoRa library](https://github.com/sandeepmistry/arduino-LoRa#compati
 | Dependency | Version / purpose |
 | --- | --- |
 | [LoRa by Sandeep Mistry](https://github.com/sandeepmistry/arduino-LoRa) | **0.8.0** — radio communication through `LoRa.h` |
-| [ESP32 by Espressif Systems](https://docs.espressif.com/projects/arduino-esp32/en/latest/) | **3.3.0** in CI — ESP32 board support, SPI, and system headers |
-| Arduino IDE or Arduino CLI | IDE for interactive upload; CLI **1.x** in CI |
+| [ESP32 by Espressif Systems](https://docs.espressif.com/projects/arduino-esp32/en/latest/) | **3.3.0** in the documented local setup — ESP32 board support, SPI, and system headers |
+| Arduino IDE or Arduino CLI | For local compilation and upload; CLI **1.x** in the command-line examples |
 
 The LoRa dependency is the **LoRa 0.8.0** package shown in Arduino Library Manager, authored by **Sandeep Mistry**. Install it through Library Manager or with `arduino-cli lib install "LoRa@0.8.0"`. Its source and MIT license are available in the [upstream repository](https://github.com/sandeepmistry/arduino-LoRa).
 
@@ -113,7 +113,7 @@ Alternatively, use **Code → Download ZIP** on GitHub and extract the archive.
    https://espressif.github.io/arduino-esp32/package_esp32_index.json
    ```
 
-3. Open **Boards Manager**, search for **esp32**, and install **esp32 by Espressif Systems**, selecting version **3.3.0** to match CI.
+3. Open **Boards Manager**, search for **esp32**, and install **esp32 by Espressif Systems**, selecting version **3.3.0** for the documented setup.
 4. Select **Tools → Board → esp32 → ESP32 Dev Module** for an ESP-WROOM-32 development board.
 
 See Espressif's [installation guide](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html#installing-using-arduino-ide) for platform-specific details.
@@ -235,11 +235,11 @@ esp-lora-link/
 
 ## Continuous integration
 
-[GitHub Actions CI](https://github.com/pravennn08/esp-lora-link/actions/workflows/ci.yml) compiles both sketches for **ESP32 Dev Module** on every push and pull request. You can also run it manually from the repository's **Actions → CI → Run workflow** menu after the workflow is on the default branch.
+[GitHub Actions CI](https://github.com/pravennn08/esp-lora-link/actions/workflows/ci.yml) runs lightweight repository checks on every push and pull request. You can also run it manually from the repository's **Actions → CI → Run workflow** menu after the workflow is on the default branch.
 
-The workflow uses Arduino CLI 1.x, ESP32 core **3.3.0**, and LoRa **0.8.0**. Each node gets its own build job and compiles directly from its matching sketch folder. Update the dependency versions in `.github/workflows/ci.yml` when changing the build environment.
+It checks that both sketch folders contain nonempty `.ino` and `LoRaButtonLink.h` files, and that the two protocol headers match. It uses Python already available on the runner; no Arduino tools, ESP32 packages, or LoRa libraries are downloaded.
 
-CI checks compilation; use the physical two-board demo above to verify wiring and radio communication.
+A passing CI check confirms those file checks only. Compile the firmware locally with Arduino IDE or the commands in [CONTRIBUTING.md](CONTRIBUTING.md), then use the physical two-board demo above to verify wiring and radio communication. Editing and pushing from VS Code does not require committing installed libraries to this repository.
 
 ## Troubleshooting
 
