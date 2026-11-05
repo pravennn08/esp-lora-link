@@ -4,6 +4,10 @@ Notable changes to ESP LoRa Link are recorded here. Changes awaiting a tagged re
 
 ## Unreleased
 
+### Fixed
+
+- Retry dependency downloads in CI up to three times to tolerate temporary server failures during ESP32 core or LoRa installation.
+
 ### Added
 
 - Setup and upload tutorial, wiring tables, radio settings, and troubleshooting in the README.
